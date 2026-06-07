@@ -9,28 +9,38 @@ typedef void* ThreadArg;
 
 namespace Utils
 {
-    
-    struct ThreadContext
-    {
-        ThreadArg mArg;
-        ThreadFuncPtr mTask;
-        ThreadContext() : mArg(nullptr), mTask(nullptr) {};
-    private:
-        CLASS_IS_NON_COPYABLE(ThreadContext);
-    };
-
     class Thread
     {
+    public:
         Thread( bool isCancellable, bool isJoinable );
         ~Thread();
-        int Run( const ThreadContext& );
+        int Run( const ThreadArg arg, const ThreadFuncPtr func );
         int Join();
         int Cancel();
+        const int GetLastError() const ;
+        const char *GetLastErrorStr() const;
     private:
-        bool mInstantiated;
+    
+        
+        /// @brief Thread context object
+        struct ThreadContext
+        {
+            Thread& mThread;
+            ThreadArg mArg;
+            ThreadFuncPtr mTask;
+            ThreadContext( Thread& thread ) : mThread(thread), mArg(nullptr), mTask(nullptr) {};
+            private:
+            CLASS_IS_NON_COPYABLE(ThreadContext);
+        };
+    
+        static void* ThreadEntry( void* context );
+        
         bool mIsRunning;
-        bool mIsJoinable;
         bool mIsCancellable;
+        bool mIsJoinable;
+        bool mHasReturned;
+        int mLastError;
+        ThreadContext mContext;
         pthread_t mInstance;
     CLASS_IS_NON_COPYABLE(Thread)
     };
