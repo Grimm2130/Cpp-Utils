@@ -1,5 +1,5 @@
-#if !defined(__PRINT_UTILS_H__)
-#define __PRINT_UTILS_H__
+#if !defined(__PRINT_H__)
+#define __PRINT_H__
 
 #include "CppTemplates/Templates.h"
 #include <stdio.h>
@@ -31,7 +31,7 @@ namespace Utils
 
     public:
 
-        static void Info( const Type format, const char * msg, ... )
+        static void Info( const char * msg, ... )
         {
             va_list arg;
             va_start( arg, msg );
@@ -39,7 +39,7 @@ namespace Utils
             va_end( arg );
         }
 
-        static void Warning( const Type format, const char * msg, ... )
+        static void Warning( const char * msg, ... )
         {
             va_list arg;
             va_start( arg, msg );
@@ -47,7 +47,7 @@ namespace Utils
             va_end( arg );
         }
 
-        static void Error( const Type format, const char * msg, ... )
+        static void Error( const char * msg, ... )
         {
             va_list arg;
             va_start( arg, msg );
@@ -55,7 +55,7 @@ namespace Utils
             va_end( arg );
         }
 
-        static void Success( const Type format, const char * msg, ... )
+        static void Success( const char * msg, ... )
         {
             va_list arg;
             va_start( arg, msg );
@@ -70,7 +70,7 @@ namespace Utils
             char buffer[DEFAULT_BUFFER_SIZE];
             buffer[0] = '\0';
 
-            int len = vsnprintf( buffer, DEFAULT_BUFFER_SIZE, msg, *argPtr );
+            int len = vsnprintf( buffer, DEFAULT_BUFFER_SIZE, msg, (*argPtr) );
 
             if( len > 0 )
             {
@@ -102,4 +102,4 @@ namespace Utils
 } // namespace Utils
 
 
-#endif // __PRINT_UTILS_H__
+#endif // __PRINT_H__

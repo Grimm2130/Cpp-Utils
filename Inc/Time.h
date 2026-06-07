@@ -15,35 +15,35 @@ namespace Utils
 
     public:
 
-        inline const TimeSpec GetTime()
+        inline static const TimeSpec GetTime()
         {
             TimeSpec time;
             clock_gettime(CLOCK_MONOTONIC, &time);
             return time;
         }
 
-        inline uint64_t GetSeconds()
+        inline static uint64_t GetSeconds()
         {
             TimeSpec time;
             clock_gettime(CLOCK_MONOTONIC, &time);
             return time.tv_sec;
         }
 
-        inline uint64_t GetMilliSeconds()
+        inline static uint64_t GetMilliSeconds()
         {
             TimeSpec time;
             clock_gettime(CLOCK_MONOTONIC, &time);
             return (time.tv_sec * 1E3) + (time.tv_nsec / 1E6);
         }
 
-        inline uint64_t GetMicroSeconds()
+        inline static uint64_t GetMicroSeconds()
         {
             TimeSpec time;
             clock_gettime(CLOCK_MONOTONIC, &time);
             return (time.tv_sec * 1E6) + (time.tv_nsec / 1E3);
         }
 
-        inline uint64_t GetNanoSeconds()
+        inline static uint64_t GetNanoSeconds()
         {
             TimeSpec time;
             clock_gettime(CLOCK_MONOTONIC, &time);

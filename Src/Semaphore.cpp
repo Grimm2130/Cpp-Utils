@@ -1,5 +1,4 @@
 #include "Semaphore.h"
-#include "Mutex.h"
 #include "Time.h"
 #include <cerrno>
 #include <cstring>
@@ -47,6 +46,7 @@ namespace Utils
             {
                 mLastError = sem_trywait(&mInstance);
             }
+            return mLastError;
         }
 
         int Semaphore::TimedWait( long seconds, long nanoseconds  )
@@ -64,8 +64,9 @@ namespace Utils
         {
             if( mInitialized )
             {
-                
+                mLastError = sem_post(&mInstance);
             }
+            return mLastError;
         }
 
         const int Semaphore::GetLastError() const

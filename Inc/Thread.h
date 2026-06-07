@@ -3,8 +3,9 @@
 
 #include "CppTemplates/Templates.h"
 #include <pthread.h>
+#include <atomic>
 
-typedef void (*ThreadFuncPtr)(void*);
+typedef void* (*ThreadFuncPtr)(void*);
 typedef void* ThreadArg;
 
 namespace Utils
@@ -12,7 +13,7 @@ namespace Utils
     class Thread
     {
     public:
-        Thread( bool isCancellable, bool isJoinable );
+        Thread( bool isCancellable = true, bool isJoinable = true );
         ~Thread();
         int Run( const ThreadArg arg, const ThreadFuncPtr func );
         int Join();
@@ -35,10 +36,10 @@ namespace Utils
     
         static void* ThreadEntry( void* context );
         
-        bool mIsRunning;
-        bool mIsCancellable;
-        bool mIsJoinable;
-        bool mHasReturned;
+        const bool mIsJoinable;
+        const bool mIsCancellable;
+        std::atomic_bool mIsRunning;
+        std::atomic_bool mHasReturned;
         int mLastError;
         ThreadContext mContext;
         pthread_t mInstance;

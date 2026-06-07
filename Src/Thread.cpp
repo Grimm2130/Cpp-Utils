@@ -1,4 +1,5 @@
 #include "Thread.h"
+#include "Print.h"
 #include <string.h>
 
 namespace Utils
@@ -8,6 +9,7 @@ namespace Utils
         mIsCancellable(isCancellable),
         mIsJoinable(isJoinable),
         mHasReturned( !isJoinable ),
+        mLastError(0),
         mContext(*this)
     {
     }
@@ -23,18 +25,30 @@ namespace Utils
 
     int Thread::Run( const ThreadArg arg, const ThreadFuncPtr func )
     {
-        mContext.mArg = arg;
-        mContext.mTask = func;
-        pthread_attr_t attr;
-
-        if( mIsJoinable == false )
+        if( mIsRunning == false )
         {
-            mLastError = pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );
-        }
+            mContext.mArg = arg;
+            mContext.mTask = func;
+            pthread_attr_t attr;
+            
+            pthread_attr_init(&attr);
+    
+            if( mIsJoinable == false )
+            {
+                mLastError = pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );
+            }
+    
+            if( mLastError == 0 )
+            {
+                mLastError = pthread_create( &mInstance, &attr, ThreadEntry, (void*)(&mContext) );
 
-        if( mLastError == 0 )
-        {
-            mLastError = pthread_create( &mInstance, &attr, ThreadEntry, (void*)(&mContext) );
+                if( mLastError != 0 )
+                {
+                    Print::Error("Thread creation failed...");
+                }
+            }
+    
+            pthread_attr_destroy(&attr);
         }
 
         return mLastError;
@@ -46,7 +60,7 @@ namespace Utils
 
         contextPtr->mThread.mIsRunning = true;
 
-        if(contextPtr->mThread.mIsCancellable )
+        if(contextPtr->mThread.mIsCancellable == false )
         {
             contextPtr->mThread.mLastError = pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
         }
@@ -55,7 +69,9 @@ namespace Utils
 
         contextPtr->mThread.mIsRunning = false;
 
-        pthread_exit(NULL);
+        contextPtr->mThread.mHasReturned = true;
+
+        return nullptr;
     }
 
     int Thread::Join()
@@ -67,6 +83,10 @@ namespace Utils
             if( mLastError == 0 )
             {
                 mHasReturned = true;
+            }
+            else
+            {
+                Print::Error("Thread Failed on Join::%s\n", GetLastErrorStr() );
             }
         }
         return mLastError;
